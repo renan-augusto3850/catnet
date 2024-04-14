@@ -1,10 +1,10 @@
-# Catnat
+# Catnet
 Sehol runtime for web.
 # How to run?
 
 In Windows, add to your path variable and run:
 
-$catnat your_file.sl
+$catnet your_file.shl
 
 # Example
 
