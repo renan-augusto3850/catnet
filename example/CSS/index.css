@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+body{
+    font-family: Inter;
+    text-align: center;
+    padding-top: 45px;
+}
+header{
+    display: flex;
+    position: fixed;
+    background-color: rgb(132, 207, 18);
+    width: 100%;
+    top: 0;
+    padding: 10px;
+    left: 0;
+}
+header > h1{
+    margin: auto;
+}
+.links{
+    position: absolute;
+    background-color: green;
+    width: 100%;
+    padding: 16px;
+    height: 200px;
+    left: 0;
+}
+.links > a{
+    background-color: white;
+    position: relative;
+    padding: 8px;
+    margin: auto;
+    top: 10px;
+    border-radius: 10px;
+    color: black;
+    height: 100px;
+    text-decoration: none;
+}
+.links > a:hover{
+    color: blue;
+    text-decoration: blue;
+}
