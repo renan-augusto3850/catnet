@@ -1,3 +1,13 @@
 var texto = readFile("index.html");
+var probabilidade = readFile("PAGES/probabilidade.html");
+var numeros-primos = readFile("PAGES/numeros-primos.html");
 catnet.startServer(500);
-catnet.send(texto);
+catnet.route(/) {
+    catnet.send(texto);
+}
+catnet.route(/probabilidade) {
+    catnet.send(probabilidade);
+}
+catnet.route(/numeros-primos) {
+    catnet.send(numeros-primos);
+}

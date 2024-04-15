@@ -17,8 +17,9 @@ struct AstElement{
     string type;
     string params;
     string completeLine;
-    AstElement* nextElement;
-    AstElement() : nextElement(nullptr) {}
+    string action;
+    AstElement* element;
+    AstElement() : element(nullptr) {}
 };
 
 struct variables{
@@ -59,6 +60,18 @@ AstElement* parser(string expression, int childrenLine) {
             element->params = expression.substr(pos1 + 1, pos2 - pos1 - 1);
             element->completeLine = expression;
         }
+        if(expressionCatch.find("route") != string::npos) {
+            size_t pos1 = expression.find("(");
+            size_t pos2 = expression.find(")");
+            size_t p1 = expression.find("{");
+            size_t p2 = expression.find("}");
+            element->name = "route";
+            element->line = childrenLine;
+            element->type = "checkRoute";
+            element->params = expression.substr(pos1 + 1, pos2 - pos1 - 1);
+            element->completeLine = expression;
+            element->action = expression.substr(p1 + 1, p2 - p1 - 1);
+        }
     }
         if(expression.find("printLog") != string::npos) {
             size_t pos1 = expression.find("(");
@@ -80,7 +93,7 @@ AstElement* parser(string expression, int childrenLine) {
                     text += line + "\n";
                 }
             } else {
-                cerr <<  "\033[31m" << "SeholError:" << "File not open." << "\033[0m" << endl;
+                cerr <<  "\033[31m" << "CatnetError:" << "File not open." << "\033[0m" << endl;
                 cerr << "\033[4m   " << expression.substr(pos1 + 2, pos2 - pos1 - 3) << "\033[0m" << endl;
             }
             variableTable[var.name].value = text;
@@ -88,7 +101,7 @@ AstElement* parser(string expression, int childrenLine) {
     return element;
 }
 
-class grammarProcess {
+/*class grammarProcess {
     public:
         bool checkisInt(string value) {
             for (char c : value) {
@@ -104,9 +117,9 @@ class grammarProcess {
             }
             return false;
         }
-};
+};*/
 
-bool grammarAnalisis(const string (&atributes)[4][4]) {
+/*bool grammarAnalisis(const string (&atributes)[4][4]) {
     bool pass = true;
     grammarProcess process;
     for(int i = 0; i < 4; i++) {
@@ -114,16 +127,16 @@ bool grammarAnalisis(const string (&atributes)[4][4]) {
        
     }
     return pass;
-}
+}*/
 
-string replaceValue(string windowcode, string value, string data) {
+/*string replaceValue(string windowcode, string value, string data) {
     size_t pos = 0;
     while ((pos = windowcode.find(value, pos)) != string::npos) {
         windowcode.replace(pos, value.length(), data);
         pos += data.length();
     }
     return windowcode;
-}
+}*/
 SOCKET serverSocket;
 int openSocket(string port) {
     WSADATA wsaData;
@@ -155,9 +168,9 @@ int openSocket(string port) {
     }
     return 0;
 }
-
 bool ignoreThis = false;
 SOCKET clientSocket;
+string route;
 int startRuntime(vector<AstElement*> elementsVector) {
     for(const auto& elements : elementsVector) {
         if(elements->type == "startServer"){
@@ -174,6 +187,24 @@ int startRuntime(vector<AstElement*> elementsVector) {
                 closesocket(serverSocket);
                 WSACleanup();
             }
+            char buffer[1024];
+            int bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
+            if (bytesReceived == SOCKET_ERROR) {
+                std::cerr << "Erro ao receber dados do cliente" << std::endl;
+                closesocket(clientSocket);
+                closesocket(serverSocket);
+                WSACleanup();
+                return 1;
+            }
+
+            string request(buffer, bytesReceived);
+
+            size_t start = request.find("GET ") + 4;
+            size_t end = request.find(" HTTP");
+
+            if (start != string::npos && end != string::npos) {
+                route = request.substr(start, end - start);
+            }
         }else if(elements->type == "sendResponse") {
             string response;
             if(!variableTable[elements->params].name.empty()) {
@@ -181,11 +212,21 @@ int startRuntime(vector<AstElement*> elementsVector) {
             } else{
                 response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n" + elements->params + "\r\n";
             }
-            int result = send(clientSocket, response.c_str(), response.size(), 0);
+            send(clientSocket, response.c_str(), response.size(), 0);
             closesocket(clientSocket);
         }else if(elements->type == "printLogConsole") {
             cout << elements->params << endl;
+        } else if(elements->type == "checkRoute") {
+            if(route == elements->params) {
+                vector<AstElement*> elementVector;
+                AstElement* element;
+                element = parser(elements->action, 0);
+                if(!element->name.empty()) {
+                    elementVector.push_back(element);
+                }
+                startRuntime(elementVector);
             }
+        }
     }
     return 0;
 }
@@ -196,6 +237,7 @@ int main(int argc, char *argv[]) {
     AstElement* expression;
     int startline = 0;
     int count = 0;
+    bool blockOfCommand =  false;
     vector<AstElement*> elements;
     int validator = 0;
     if(argv[1] != NULL){
@@ -212,11 +254,19 @@ int main(int argc, char *argv[]) {
                     startline = lineCout;
                     validator = 1;
                 }
-                expression = parser(archive, childrenLine);
-                archive = "";
-                if(!expression->name.empty()) {
-                    elements.push_back(expression);
-                    count++;
+                if(line.find("{") != string::npos) {
+                    blockOfCommand = true;
+                }
+                if(line.find("}") != string::npos) {
+                    blockOfCommand = false;
+                }
+                if(blockOfCommand == false) {
+                    expression = parser(archive, childrenLine);
+                    archive = "";
+                    if(!expression->name.empty()) {
+                        elements.push_back(expression);
+                        count++;
+                    }
                 }
                     
                 validator = 0;
