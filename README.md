@@ -1,5 +1,5 @@
 # Catnet
-![CatnetLogo](https://raw.githubusercontent.com/renan-augusto3850/catnet/main/catnet.png)
+![CatnetLogo](https://raw.githubusercontent.com/renan-augusto3850/catnet/main/catnet-small.png)
 
 Sehol runtime for web.
 # How to run?
