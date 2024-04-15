@@ -4,7 +4,7 @@ Sehol runtime for web.
 
 In Windows, add to your path variable and run:
 
-$catnet your_file.sl
+$catnet your_file.shl
 
 # Example
 
