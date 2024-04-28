@@ -1,13 +1,17 @@
-var texto = readFile("index.html");
-var probabilidade = readFile("PAGES/probabilidade.html");
-var numeros-primos = readFile("PAGES/numeros-primos.html");
-catnet.startServer(500);
+catnet.startServer(127.0.0.1, 500);
 catnet.route(/) {
+    var texto = readFile("index.html");
     catnet.send(texto);
 }
 catnet.route(/probabilidade) {
+    var probabilidade = readFile("PAGES/probabilidade.html");
     catnet.send(probabilidade);
 }
 catnet.route(/numeros-primos) {
+    var numeros-primos = readFile("PAGES/numeros-primos.html");
     catnet.send(numeros-primos);
+}
+catnet.route(/CSS/index.css) {
+    var css = readFile("CSS/index.css");
+    catnet.send(css, text/css);
 }
