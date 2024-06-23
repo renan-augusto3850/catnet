@@ -1,17 +1,24 @@
-catnet.startServer(127.0.0.1, 500);
+catnet.startServer(127.0.0.1, 8585);
 catnet.route(/) {
     var texto = readFile("index.html");
     catnet.send(texto);
 }
-catnet.route(/probabilidade) {
-    var probabilidade = readFile("PAGES/probabilidade.html");
-    catnet.send(probabilidade);
-}
-catnet.route(/numeros-primos) {
-    var numeros-primos = readFile("PAGES/numeros-primos.html");
-    catnet.send(numeros-primos);
-}
 catnet.route(/CSS/index.css) {
     var css = readFile("CSS/index.css");
     catnet.send(css, text/css);
+}
+catnet.route(/JS/inicializeManager.js) {
+    var inicialize = readFile("JS/inicializeManager.js");
+    catnet.send(inicialize, script/js);
+}
+catnet.route(/JS/main.js) {
+    var main = readFile("JS/main.js");
+    catnet.send(main, script/js);
+}
+catnet.route(/JS/cookiesManager.js) {
+    var cookiesM = readFile("JS/cookiesManager.js");
+    catnet.send(cookiesM, script/js);
+}
+catnet.route(/coringa/:teste) {
+    catnet.send(:teste);
 }
